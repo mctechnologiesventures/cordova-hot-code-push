@@ -3,20 +3,21 @@ Helper class to work with Swift.
 Mainly, it has only two method: to activate and to deactivate swift support in the project.
 */
 
-var path = require('path');
-var fs = require('fs');
-var strFormat = require('util').format;
+var path = require("path");
+var fs = require("fs");
+var strFormat = require("util").format;
 var COMMENT_KEY = /_comment$/;
-var WKWEBVIEW_PLUGIN_NAME = 'cordova-plugin-wkwebview-engine';
-var WKWEBVIEW_MACRO = 'WK_WEBVIEW_ENGINE_IS_USED';
+var WKWEBVIEW_PLUGIN_NAME = "cordova-plugin-wkwebview-engine";
+var WKWEBVIEW_MACRO = "WK_WEBVIEW_ENGINE_IS_USED";
 var isWkWebViewEngineUsed = 0;
 var context;
 var projectRoot;
 var projectName;
 var iosPlatformPath;
+var xcode = require("xcode");
 
 module.exports = {
-  setWKWebViewEngineMacro: setWKWebViewEngineMacro
+  setWKWebViewEngineMacro: setWKWebViewEngineMacro,
 };
 
 /**
@@ -44,9 +45,13 @@ function init(ctx) {
   context = ctx;
   projectRoot = ctx.opts.projectRoot;
   projectName = getProjectName(ctx, projectRoot);
-  iosPlatformPath = path.join(projectRoot, 'platforms', 'ios');
+  iosPlatformPath = path.join(projectRoot, "platforms", "ios");
 
-  var wkWebViewPluginPath = path.join(projectRoot, 'plugins', WKWEBVIEW_PLUGIN_NAME);
+  var wkWebViewPluginPath = path.join(
+    projectRoot,
+    "plugins",
+    WKWEBVIEW_PLUGIN_NAME
+  );
   isWkWebViewEngineUsed = isDirectoryExists(wkWebViewPluginPath) ? 1 : 0;
 }
 
@@ -55,8 +60,7 @@ function isDirectoryExists(dir) {
   try {
     fs.accessSync(dir, fs.F_OK);
     exists = true;
-  } catch(err) {
-  }
+  } catch (err) {}
 
   return exists;
 }
@@ -68,47 +72,87 @@ function isDirectoryExists(dir) {
  */
 function loadProjectFile() {
   try {
-    return loadProjectFile_cordova_7_and_above();
-  } catch(e) {
-  }
-  
-  try {
-    return loadProjectFile_cordova_5_and_6();
-  } catch(e) {
-  }
-
-  try {
-    return loadProjectFile_cordova_pre_5();
+    console.log("loadProjectFile_cordova_9_and_above");
+    return loadProjectFile_cordova_9_and_above();
   } catch (e) {
+    console.log(e);
   }
 
-  throw new Error('Failed to load iOS project file. Maybe your Cordova version is not supported?');
+  try {
+    console.log("loadProjectFile_cordova_7_and_above");
+    return loadProjectFile_cordova_7_and_above();
+  } catch (e) {
+    console.log(e);
+  }
+
+  try {
+    console.log("loadProjectFile_cordova_5_and_6");
+    return loadProjectFile_cordova_5_and_6();
+  } catch (e) {}
+
+  try {
+    console.log("loadProjectFile_cordova_pre_5");
+    return loadProjectFile_cordova_pre_5();
+  } catch (e) {}
+
+  throw new Error(
+    "Failed to load iOS project file. Maybe your Cordova version is not supported?"
+  );
 }
 
 function loadProjectFile_cordova_pre_5() {
-  var platformIos = context.requireCordovaModule('cordova-lib/src/plugman/platforms')['ios'];
+  var platformIos = context.requireCordovaModule(
+    "cordova-lib/src/plugman/platforms"
+  )["ios"];
 
   return platformIos.parseProjectFile(iosPlatformPath);
 }
 
 function loadProjectFile_cordova_5_and_6() {
-  var platformIos = context.requireCordovaModule('cordova-lib/src/plugman/platforms/ios');
-  
+  var platformIos = context.requireCordovaModule(
+    "cordova-lib/src/plugman/platforms/ios"
+  );
+
   return platformIos.parseProjectFile(iosPlatformPath);
 }
 
 function loadProjectFile_cordova_7_and_above() {
-  var pbxPath = path.join(iosPlatformPath, projectName + '.xcodeproj', 'project.pbxproj');
-  var xcodeproj = context.requireCordovaModule('xcode').project(pbxPath);
+  var pbxPath = path.join(
+    iosPlatformPath,
+    projectName + ".xcodeproj",
+    "project.pbxproj"
+  );
+  console.log(pbxPath);
+  var xcodeproj = context.requireCordovaModule("xcode").project(pbxPath);
   xcodeproj.parseSync();
 
-  var saveProj = function() {
+  var saveProj = function () {
     fs.writeFileSync(pbxPath, xcodeproj.writeSync());
   };
 
   return {
     xcode: xcodeproj,
-    write: saveProj
+    write: saveProj,
+  };
+}
+
+function loadProjectFile_cordova_9_and_above() {
+  var pbxPath = path.join(
+    iosPlatformPath,
+    projectName + ".xcodeproj",
+    "project.pbxproj"
+  );
+  console.log(pbxPath);
+  var xcodeproj = xcode.project(pbxPath);
+  xcodeproj.parseSync();
+
+  var saveProj = function () {
+    fs.writeFileSync(pbxPath, xcodeproj.writeSync());
+  };
+
+  return {
+    xcode: xcodeproj,
+    write: saveProj,
   };
 }
 
@@ -121,16 +165,20 @@ function loadProjectFile_cordova_7_and_above() {
  * @return {String} name of the project
  */
 function getProjectName(ctx, projectRoot) {
-  var cordova_util = ctx.requireCordovaModule('cordova-lib/src/cordova/util');
+  var cordova_util = ctx.requireCordovaModule("cordova-lib/src/cordova/util");
   var xml = cordova_util.projectConfig(projectRoot);
   var ConfigParser;
 
   // If we are running Cordova 5.4 or abova - use parser from cordova-common.
   // Otherwise - from cordova-lib.
   try {
-    ConfigParser = ctx.requireCordovaModule('cordova-common/src/ConfigParser/ConfigParser');
+    ConfigParser = ctx.requireCordovaModule(
+      "cordova-common/src/ConfigParser/ConfigParser"
+    );
   } catch (e) {
-    ConfigParser = ctx.requireCordovaModule('cordova-lib/src/configparser/ConfigParser')
+    ConfigParser = ctx.requireCordovaModule(
+      "cordova-lib/src/configparser/ConfigParser"
+    );
   }
 
   return new ConfigParser(xml).name();
@@ -165,13 +213,17 @@ function nonComments(obj) {
  * @param {Object} xcodeProject - xcode project file instance
  */
 function setMacro(xcodeProject) {
-  var configurations = nonComments(xcodeProject.pbxXCBuildConfigurationSection());
+  var configurations = nonComments(
+    xcodeProject.pbxXCBuildConfigurationSection()
+  );
   var config;
   var buildSettings;
 
   for (config in configurations) {
     buildSettings = configurations[config].buildSettings;
-    var preprocessorDefs = buildSettings['GCC_PREPROCESSOR_DEFINITIONS'] ? buildSettings['GCC_PREPROCESSOR_DEFINITIONS'] : [];
+    var preprocessorDefs = buildSettings["GCC_PREPROCESSOR_DEFINITIONS"]
+      ? buildSettings["GCC_PREPROCESSOR_DEFINITIONS"]
+      : [];
     if (!preprocessorDefs.length && !isWkWebViewEngineUsed) {
       continue;
     }
@@ -181,8 +233,12 @@ function setMacro(xcodeProject) {
     }
 
     var isModified = false;
-    var injectedDefinition = strFormat('"%s=%d"', WKWEBVIEW_MACRO, isWkWebViewEngineUsed);
-    preprocessorDefs.forEach(function(item, idx) {
+    var injectedDefinition = strFormat(
+      '"%s=%d"',
+      WKWEBVIEW_MACRO,
+      isWkWebViewEngineUsed
+    );
+    preprocessorDefs.forEach(function (item, idx) {
       if (item.indexOf(WKWEBVIEW_MACRO) !== -1) {
         preprocessorDefs[idx] = injectedDefinition;
         isModified = true;
@@ -194,9 +250,9 @@ function setMacro(xcodeProject) {
     }
 
     if (preprocessorDefs.length === 1) {
-      buildSettings['GCC_PREPROCESSOR_DEFINITIONS'] = preprocessorDefs[0];
+      buildSettings["GCC_PREPROCESSOR_DEFINITIONS"] = preprocessorDefs[0];
     } else {
-      buildSettings['GCC_PREPROCESSOR_DEFINITIONS'] = preprocessorDefs;
+      buildSettings["GCC_PREPROCESSOR_DEFINITIONS"] = preprocessorDefs;
     }
   }
 }
