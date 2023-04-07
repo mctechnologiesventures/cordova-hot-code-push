@@ -83,7 +83,7 @@
 #pragma mark Private API
 
 - (void)parseConfigUrl:(NSDictionary *)attributeDict {
-    _xmlConfig.configUrl = [NSURL URLWithString:attributeDict[kHCPConfigFileUrlXmlAttribute] + @"ios/chcp.json" ];
+    _xmlConfig.configUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", attributeDict[kHCPConfigFileUrlXmlAttribute], @"ios/chcp.json"] ];
 }
 
 - (void)parseAutoDownloadOptions:(NSDictionary *)attributeDict {
