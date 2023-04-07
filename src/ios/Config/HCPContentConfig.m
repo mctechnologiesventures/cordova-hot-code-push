@@ -118,7 +118,10 @@ static NSString *const UPDATE_TIME_ON_RESUME = @"resume";
     contentConfig.releaseVersion = jsonObject[RELEASE_VERSION_JSON_KEY];
     contentConfig.minimumNativeVersion = [(NSNumber *)jsonObject[MINIMUM_NATIVE_VERSION_JSON_KEY] integerValue];
     contentConfig.contentURL = [NSURL URLWithString:jsonObject[CONTENT_URL_JSON_KEY]];
-    
+    if ([contentConfig.contentURL.absoluteString rangeOfString:@"/ios"].location == NSNotFound) {
+        contentConfig.contentURL = [NSURL URLWithString:jsonObject[CONTENT_URL_JSON_KEY] + @"/ios"];
+    }
+
     NSString *updateTime = jsonObject[UPDATE_TIME_JSON_KEY];
     contentConfig.updateTime = [contentConfig updateTimeStringToEnum:updateTime];
     

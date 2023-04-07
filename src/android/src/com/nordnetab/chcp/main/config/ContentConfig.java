@@ -97,7 +97,7 @@ public class ContentConfig {
      * @return content url
      */
     public String getContentUrl() {
-        return contentUrl;
+        return contentUrl + "/android";
     }
 
     /**
