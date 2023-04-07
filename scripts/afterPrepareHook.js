@@ -22,19 +22,18 @@ If no option is provided - hook will use .chcpenv file to build for local develo
 More information can be found on https://github.com/nordnet/cordova-hot-code-push.
 */
 
-var chcpBuildOptions = require('./lib/chcpBuildOptions.js');
-var chcpConfigXmlReader = require('./lib/chcpConfigXmlReader.js');
-var chcpConfigXmlWriter = require('./lib/chcpConfigXmlWriter.js');
-var iosWKWebViewEngineSupport = require('./lib/iosWKWebViewEngineSupport.js');
-var BUILD_OPTION_PREFIX = 'chcp-';
-var RELEASE_BUILD_FLAG = '--release';
+var chcpBuildOptions = require("./lib/chcpBuildOptions.js");
+var chcpConfigXmlReader = require("./lib/chcpConfigXmlReader.js");
+var chcpConfigXmlWriter = require("./lib/chcpConfigXmlWriter.js");
+var BUILD_OPTION_PREFIX = "chcp-";
+var RELEASE_BUILD_FLAG = "--release";
 
 function logStart() {
-  console.log('CHCP plugin after prepare hook:');
+  console.log("CHCP plugin after prepare hook:");
 }
 
 function printLog(msg) {
-  var formattedMsg = '    ' + msg;
+  var formattedMsg = "    " + msg;
   console.log(formattedMsg);
 }
 
@@ -61,7 +60,7 @@ function processConsoleOptions(ctx) {
 function processConsoleOptions_cordova_53(consoleOptions) {
   var parsedOptions = {
     isRelease: false,
-    buildOption: ''
+    buildOption: "",
   };
 
   // Search for release flag, or plugin-specific build options.
@@ -71,7 +70,7 @@ function processConsoleOptions_cordova_53(consoleOptions) {
       parsedOptions.isRelease = true;
       break;
     } else if (opt.indexOf(BUILD_OPTION_PREFIX) == 0) {
-      parsedOptions.buildOption = opt.replace(BUILD_OPTION_PREFIX, '');
+      parsedOptions.buildOption = opt.replace(BUILD_OPTION_PREFIX, "");
       break;
     }
   }
@@ -80,7 +79,7 @@ function processConsoleOptions_cordova_53(consoleOptions) {
 }
 
 function isString(s) {
-  return typeof(s) === 'string' || s instanceof String;
+  return typeof s === "string" || s instanceof String;
 }
 
 function processConsoleOptions_cordova_54(consoleOptions) {
@@ -88,11 +87,11 @@ function processConsoleOptions_cordova_54(consoleOptions) {
   // Will be simplified later, when Cordova 5.4.x will be used more wide.
   var parsedOptions = {
     isRelease: false,
-    buildOption: ''
+    buildOption: "",
   };
 
   // if building for release - save that and exit
-  if (consoleOptions.hasOwnProperty('release')) {
+  if (consoleOptions.hasOwnProperty("release")) {
     parsedOptions.isRelease = consoleOptions.release;
     return parsedOptions;
   }
@@ -109,7 +108,7 @@ function processConsoleOptions_cordova_54(consoleOptions) {
       continue;
     }
 
-    parsedOptions.buildOption = opt.replace(BUILD_OPTION_PREFIX, '');
+    parsedOptions.buildOption = opt.replace(BUILD_OPTION_PREFIX, "");
 
     break;
   }
@@ -129,18 +128,25 @@ function prepareWithCustomBuildOption(ctx, optionName, chcpXmlOptions) {
     return false;
   }
 
-  var buildConfig = chcpBuildOptions.getBuildConfigurationByName(ctx, optionName);
+  var buildConfig = chcpBuildOptions.getBuildConfigurationByName(
+    ctx,
+    optionName
+  );
   if (buildConfig == null) {
-    console.warn('Build configuration for "' + optionName + '" not found in chcp.options. Ignoring it.');
+    console.warn(
+      'Build configuration for "' +
+        optionName +
+        '" not found in chcp.options. Ignoring it.'
+    );
     return false;
   }
 
-  console.log('Using config from chcp.options:');
+  console.log("Using config from chcp.options:");
   console.log(JSON.stringify(buildConfig, null, 2));
 
   mergeBuildOptions(chcpXmlOptions, buildConfig);
 
-  console.log('Resulting config will contain the following preferences:');
+  console.log("Resulting config will contain the following preferences:");
   console.log(JSON.stringify(chcpXmlOptions, null, 2));
 
   chcpConfigXmlWriter.writeOptions(ctx, chcpXmlOptions);
@@ -160,21 +166,15 @@ function mergeBuildOptions(currentXmlOptions, buildConfig) {
   }
 }
 
-module.exports = function(ctx) {
-  var buildConfig,
-    chcpXmlOptions;
+module.exports = function (ctx) {
+  var buildConfig, chcpXmlOptions;
 
   logStart();
-
-  // apply iOS-specific stuff
-  if (ctx.opts.platforms.indexOf('ios') !== -1) {
-    iosWKWebViewEngineSupport.setWKWebViewEngineMacro(ctx);
-  }
 
   // if we are running build with --release option - do nothing
   var consoleOptions = processConsoleOptions(ctx);
   if (consoleOptions.isRelease) {
-    printLog('Building for release, not changing config.xml');
+    printLog("Building for release, not changing config.xml");
     return;
   }
 
@@ -182,14 +182,20 @@ module.exports = function(ctx) {
   chcpXmlOptions = chcpConfigXmlReader.readOptions(ctx);
 
   // if any build option is provided in console - try to map it with chcpbuild.options
-  if (prepareWithCustomBuildOption(ctx, consoleOptions.buildOption, chcpXmlOptions)) {
+  if (
+    prepareWithCustomBuildOption(
+      ctx,
+      consoleOptions.buildOption,
+      chcpXmlOptions
+    )
+  ) {
     return;
   }
 
   // if none of the above
-  if (!chcpXmlOptions['config-file']) {
-    printLog('config-file preference is not set.');
+  if (!chcpXmlOptions["config-file"]) {
+    printLog("config-file preference is not set.");
   } else {
-    printLog('config-file set to ' + chcpXmlOptions['config-file']['url']);
+    printLog("config-file set to " + chcpXmlOptions["config-file"]["url"]);
   }
 };

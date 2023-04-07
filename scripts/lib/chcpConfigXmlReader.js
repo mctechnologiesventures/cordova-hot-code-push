@@ -2,14 +2,14 @@
 Helper class to read plugin-specific options from the config.xml.
 */
 
-var fs = require('fs');
-var path = require('path');
-var xmlHelper = require('./xmlHelper.js');
+var fs = require("fs");
+var path = require("path");
+var xmlHelper = require("./xmlHelper.js");
 var cordovaContext;
 var projectRoot;
 
 module.exports = {
-  readOptions: readOptions
+  readOptions: readOptions,
 };
 
 // region Public API
@@ -22,9 +22,13 @@ module.exports = {
  * @return {Object} plugin prefereces
  */
 function readOptions(ctx) {
-  var configFilePath = path.join(ctx.opts.projectRoot, 'config.xml');
+  console.log(ctx.opts.projectRoot);
+  var configFilePath = path.join(ctx.opts.projectRoot, "config.xml");
   var configXmlContent = xmlHelper.readXmlAsJson(configFilePath, true);
-
+  if (configXmlContent == null) {
+    configFilePath = path.join(ctx.opts.projectRoot, "www/config.xml");
+    configXmlContent = xmlHelper.readXmlAsJson(configFilePath, true);
+  }
   return parseConfig(configXmlContent);
 }
 
