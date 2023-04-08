@@ -49,7 +49,11 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 #pragma mark Lifecycle
 
 -(void)pluginInitialize {
-    [self doLocalInit];
+    if (![self doLocalInit]) {
+        _isPluginReadyForWork = NO;
+        
+        return;
+    }
     [self subscribeToEvents];
     
     // install www folder if it is needed
@@ -136,11 +140,14 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
 /**
  *  Perform initialization of the plugin variables.
  */
-- (void)doLocalInit {
+- (BOOL)doLocalInit {
     _defaultCallbackStoredResults = [[NSMutableArray alloc] init];
     
     // init plugin config from xml
     _pluginXmlConfig = [HCPXmlConfig loadFromCordovaConfigXml];
+    if (!_pluginXmlConfig || !_pluginXmlConfig.configUrl) {
+        return NO;
+    }
     
     // load plugin internal preferences
     _pluginInternalPrefs = [HCPPluginInternalPreferences loadFromUserDefaults];
@@ -153,6 +160,7 @@ static NSString *const DEFAULT_STARTING_PAGE = @"index.html";
     
     // init file structure for www files
     _filesStructure = [[HCPFilesStructure alloc] initWithReleaseVersion:_pluginInternalPrefs.currentReleaseVersionName];
+    return YES;
 }
 
 /**
