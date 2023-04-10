@@ -91,7 +91,10 @@ public class HotCodePushPlugin extends CordovaPlugin {
     public void initialize(final CordovaInterface cordova, final CordovaWebView webView) {
         super.initialize(cordova, webView);
 
-        parseCordovaConfigXml();
+        if (!parseCordovaConfigXml()) {
+          isPluginReadyForWork = false;
+          return;
+        }
         loadPluginInternalPreferences();
 
         Log.d("CHCP", "Currently running release version " + pluginInternalPrefs.getCurrentReleaseVersionName());
@@ -114,6 +117,9 @@ public class HotCodePushPlugin extends CordovaPlugin {
             eventBus.register(this);
         }
 
+        if (chcpXmlConfig.getConfigUrl() == null || chcpXmlConfig.getConfigUrl().length() == 0) {
+          return;
+        }
         // ensure that www folder installed on external storage;
         // if not - install it
         isPluginReadyForWork = isPluginReadyForWork();
@@ -205,12 +211,16 @@ public class HotCodePushPlugin extends CordovaPlugin {
      *
      * @see ChcpXmlConfig
      */
-    private void parseCordovaConfigXml() {
+    private boolean parseCordovaConfigXml() {
         if (chcpXmlConfig != null) {
-            return;
+            return false;
         }
 
         chcpXmlConfig = ChcpXmlConfig.loadFromCordovaConfig(cordova.getActivity());
+        if (chcpXmlConfig.getConfigUrl() == null || chcpXmlConfig.getConfigUrl().length() == 0) {
+          return false;
+        }
+        return true;
     }
 
     /**
