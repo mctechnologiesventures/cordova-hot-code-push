@@ -56,7 +56,7 @@ public class AssetsHelper {
                     execute(applicationContext, fromDirectory, toDirectory);
                     EventBus.getDefault().post(new AssetsInstalledEvent());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     EventBus.getDefault().post(new AssetsInstallationErrorEvent());
                 } finally {
                     isWorking = false;

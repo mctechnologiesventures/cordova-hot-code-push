@@ -66,7 +66,7 @@ public class PluginInternalPreferences {
                 );
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
 
             config = null;
         }

@@ -22,7 +22,7 @@ public class MD5 {
         try {
             digest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

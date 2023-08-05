@@ -139,7 +139,7 @@ class InstallationWorker implements WorkerTask {
 
             FilesUtility.copy(currentWwwFolder, newWwwFolder);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             result = false;
         }
 
@@ -182,7 +182,7 @@ class InstallationWorker implements WorkerTask {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
 
             return false;
         }
@@ -215,7 +215,7 @@ class InstallationWorker implements WorkerTask {
                     break;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // e.printStackTrace();
                 isValid = false;
                 break;
             }

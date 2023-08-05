@@ -54,7 +54,7 @@ public class ContentConfig {
                 config.setUpdateTime(UpdateTime.ON_START);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         return config;

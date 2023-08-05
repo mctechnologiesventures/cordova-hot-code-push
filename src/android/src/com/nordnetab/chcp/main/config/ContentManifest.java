@@ -47,7 +47,7 @@ public class ContentManifest {
                 manifest.files.add(new ManifestFile(fileName, fileHash));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         manifest.jsonString = json;

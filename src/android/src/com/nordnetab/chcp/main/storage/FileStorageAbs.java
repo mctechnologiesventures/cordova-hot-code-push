@@ -42,7 +42,7 @@ abstract class FileStorageAbs<T> implements IObjectFileStorage<T> {
         try {
             FilesUtility.writeToFile(object.toString(), pathToStorableFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
 
@@ -61,7 +61,7 @@ abstract class FileStorageAbs<T> implements IObjectFileStorage<T> {
             String json = FilesUtility.readFromFile(pathToStorableFile);
             result = createInstance(json);
         } catch (IOException e) {
-            //e.printStackTrace();
+            //// e.printStackTrace();
         }
 
         return result;

@@ -55,7 +55,7 @@ abstract class JsonDownloader<T> {
 
             result = new DownloadResult<T>(value);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
 
             result = new DownloadResult<T>(e);
         }
